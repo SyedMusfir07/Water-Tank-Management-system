@@ -1,1 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SWQMS Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>Smart Water Quality Monitoring System</h1>
+    <p>ESP32 + Firebase RTDB | TDS • Turbidity • Temperature</p>
+  </header>
 
+  <div id="alert" class="alert hidden">
+    ⚠ ALERT: <span id="alertMsg"></span>
+  </div>
+
+  <main class="grid">
+    <div class="card">
+      <h2>TDS (ppm)</h2>
+      <div class="value" id="tds">--</div>
+    </div>
+
+    <div class="card">
+      <h2>Turbidity (NTU)</h2>
+      <div class="value" id="turbidity">--</div>
+    </div>
+
+    <div class="card">
+      <h2>Temperature (°C)</h2>
+      <div class="value" id="temp">--</div>
+    </div>
+
+    <div class="card">
+      <h2>Status</h2>
+      <div class="value" id="status">--</div>
+      <small id="lastKey">Last key: --</small>
+    </div>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
