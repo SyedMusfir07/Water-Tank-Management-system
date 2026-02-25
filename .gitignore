@@ -1,6 +1,0 @@
-# Ignore secret files
-secrets.h
-
-# OS files
-.DS_Store
-Thumbs.db
