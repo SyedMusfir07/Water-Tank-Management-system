@@ -2,62 +2,184 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SWQMS Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <header class="topbar">
-    <h1>Smart Water Quality Monitoring System (SWQMS)</h1>
-    <div id="statusBadge" class="badge">Connecting...</div>
-  </header>
-
-  <main class="container">
-    <section class="cards">
-      <div class="card">
-        <h3>Temperature (°C)</h3>
-        <p id="tempValue" class="value">--</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-badge">SW</div>
+        <div>
+          <h1>SWQMS</h1>
+          <p>Smart Water Quality Monitoring</p>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>TDS (ppm)</h3>
-        <p id="tdsValue" class="value">--</p>
+      <div class="side-section">
+        <span class="side-label">System</span>
+        <div class="status-card" id="systemStatusCard">
+          <div class="status-dot" id="statusDot"></div>
+          <div>
+            <h3 id="systemStatusText">Connecting...</h3>
+            <p id="systemStatusSub">Waiting for Firebase data</p>
+          </div>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Turbidity (NTU)</h3>
-        <p id="turbValue" class="value">--</p>
+      <div class="side-section">
+        <span class="side-label">Project Info</span>
+        <div class="mini-panel">
+          <p><strong>Database:</strong> Firebase Realtime DB</p>
+          <p><strong>Controller:</strong> ESP32</p>
+          <p><strong>Update Mode:</strong> Live</p>
+        </div>
       </div>
 
-      <div class="card alert">
-        <h3>Pollution Alert</h3>
-        <p id="pollutionValue" class="value">--</p>
+      <div class="side-section">
+        <span class="side-label">Safety Logic</span>
+        <div class="mini-panel">
+          <p>TDS threshold alert is based on the project logic.</p>
+        </div>
       </div>
-    </section>
+    </aside>
 
-    <section class="history">
-      <h2>Recent Readings</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Time Key</th>
-            <th>Temp (°C)</th>
-            <th>TDS (ppm)</th>
-            <th>NTU</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="historyBody">
-          <tr><td colspan="5">Loading...</td></tr>
-        </tbody>
-      </table>
-    </section>
-  </main>
+    <main class="main-content">
+      <header class="topbar">
+        <div>
+          <h2>Water Quality Dashboard</h2>
+          <p class="muted">Live monitoring interface for TDS, turbidity, temperature, and pollution status.</p>
+        </div>
+        <div class="topbar-right">
+          <div class="pill" id="lastUpdated">Last updated: --</div>
+        </div>
+      </header>
 
-  <footer class="footer">
-    <p>Developed by Syed Musfir & Team</p>
-  </footer>
+      <section class="hero">
+        <div class="hero-left">
+          <p class="hero-kicker">Live Water Safety Status</p>
+          <h3 id="heroStatusTitle">Waiting for data...</h3>
+          <p id="heroStatusDesc">
+            Dashboard is ready. As soon as Firebase sends values, the cards and history section will update automatically.
+          </p>
+        </div>
+        <div class="hero-right" id="heroAlertBox">
+          <span class="hero-alert-label">Pollution Status</span>
+          <div class="hero-alert-value" id="pollutionText">--</div>
+        </div>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card temp">
+          <div class="stat-top">
+            <span class="stat-title">Temperature</span>
+            <span class="stat-chip">DS18B20</span>
+          </div>
+          <div class="stat-value-row">
+            <span class="stat-value" id="valTemp">--</span>
+            <span class="stat-unit">°C</span>
+          </div>
+          <p class="stat-note">Water temperature from the digital temperature sensor.</p>
+        </div>
+
+        <div class="stat-card tds">
+          <div class="stat-top">
+            <span class="stat-title">TDS</span>
+            <span class="stat-chip">Conductivity</span>
+          </div>
+          <div class="stat-value-row">
+            <span class="stat-value" id="valTds">--</span>
+            <span class="stat-unit">ppm</span>
+          </div>
+          <p class="stat-note">Higher TDS generally indicates lower water purity.</p>
+        </div>
+
+        <div class="stat-card turb">
+          <div class="stat-top">
+            <span class="stat-title">Turbidity</span>
+            <span class="stat-chip">Optical</span>
+          </div>
+          <div class="stat-value-row">
+            <span class="stat-value" id="valTurb">--</span>
+            <span class="stat-unit" id="turbUnit">raw</span>
+          </div>
+          <p class="stat-note">Current frontend uses raw turbidity values from Firebase.</p>
+        </div>
+
+        <div class="stat-card quality">
+          <div class="stat-top">
+            <span class="stat-title">Quality Flag</span>
+            <span class="stat-chip">Boolean Alert</span>
+          </div>
+          <div class="stat-value-row">
+            <span class="stat-value small" id="valQuality">--</span>
+          </div>
+          <p class="stat-note">Alert becomes active when values exceed defined thresholds.</p>
+        </div>
+      </section>
+
+      <section class="panel-grid">
+        <div class="panel large-panel">
+          <div class="panel-header">
+            <div>
+              <h3>Recent Readings</h3>
+              <p class="muted">Latest records from Firebase history.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Temp (°C)</th>
+                  <th>TDS (ppm)</th>
+                  <th>Turbidity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="historyTableBody">
+                <tr>
+                  <td colspan="5" class="empty-state">Waiting for readings...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel side-panel">
+          <div class="panel-header">
+            <div>
+              <h3>System Summary</h3>
+              <p class="muted">Quick overview for presentation and viva.</p>
+            </div>
+          </div>
+          <div class="summary-list">
+            <div class="summary-item">
+              <span>Realtime database sync</span>
+              <strong id="summarySync">Active</strong>
+            </div>
+            <div class="summary-item">
+              <span>Current temperature</span>
+              <strong id="summaryTemp">--</strong>
+            </div>
+            <div class="summary-item">
+              <span>Current TDS</span>
+              <strong id="summaryTds">--</strong>
+            </div>
+            <div class="summary-item">
+              <span>Current turbidity</span>
+              <strong id="summaryTurb">--</strong>
+            </div>
+            <div class="summary-item">
+              <span>Current alert state</span>
+              <strong id="summaryPollution">--</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
 
   <script type="module" src="app.js"></script>
 </body>
